@@ -51,7 +51,6 @@ void warning_event_bind(uint8_t warning_id,uint8_t priority,WariningEvent *event
 
 void MasterSensorLostEventCallback(void *parameter)
 {
-    led_valve_on_pause();
     led_master_lost_start();
     DeviceStatus = MasterSensorLost;
 }
@@ -71,14 +70,12 @@ void MasterSensorLeakEventCallback(void *parameter)
 
 void ValveLeftFailEventCallback(void *parameter)
 {
-    led_valve_on_pause();
     led_moto_fail_start();
     DeviceStatus = ValveLeftFail;
 }
 
 void ValveRightFailEventCallback(void *parameter)
 {
-    led_valve_on_pause();
     led_moto_fail_start();
     DeviceStatus = ValveRightFail;
 }
@@ -109,7 +106,6 @@ void warning_all_clear(void)
 {
     beep_stop();
     led_warn_off();
-    led_valve_on_resume();
     DeviceStatus = get_valve_status();
     rt_memset(&NowEvent, 0, sizeof(WariningEvent));
 }
@@ -120,6 +116,5 @@ void warning_lost_clear(void)
     {
         warning_all_clear();
         led_loss_off();
-        led_valve_on_resume();
     }
 }

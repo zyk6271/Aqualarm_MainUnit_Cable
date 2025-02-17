@@ -134,19 +134,6 @@ void beep_once(void)
     led_start(beep_obj_once);
 }
 
-void led_valve_on_pause(void)
-{
-    led_stop(led_obj_on_green);
-}
-
-void led_valve_on_resume(void)
-{
-    if(get_valve_status())
-    {
-        led_start(led_obj_on_green);
-    }
-}
-
 void led_ntc_alarm(void)
 {
     led_set_mode(beep_obj, LOOP_PERMANENT,"50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50\
