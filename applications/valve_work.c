@@ -159,7 +159,7 @@ uint8_t valve_check_detect_timeout_timer_callback(void *parameter)
     {
         valve_valid = 0;
         valve_left_check_result = 1;
-        valve_right_low_check_start = 0;
+        valve_left_low_check_start = 0;
         warning_enable(ValveLeftFailEvent);
         rt_pin_write(MOTO_LEFT_CONTROL_PIN,PIN_HIGH);
         rt_timer_stop(valve_check_detect_low_timer);
