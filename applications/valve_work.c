@@ -25,7 +25,7 @@ uint8_t valve_valid = 1;
 uint8_t valve_left_low_cnt,valve_right_low_cnt = 0;
 uint8_t valve_left_low_check_start,valve_right_low_check_start = 0;
 uint8_t valve_left_detect_low_success,valve_right_detect_low_success = 0;
-uint8_t valve_left_check_result,valve_right_warning_result = 0;    //0:normal,1:warning
+uint8_t valve_left_warning_result,valve_right_warning_result = 0;    //0:normal,1:warning
 
 rt_timer_t valve_check_detect_low_timer;
 rt_timer_t valve_check_detect_timeout_timer;
@@ -93,7 +93,7 @@ rt_err_t valve_close(void)
     rt_timer_stop(valve_check_detect_timeout_timer);
     rt_timer_stop(valve_check_left_final_timer);
     rt_timer_stop(valve_check_right_final_timer);
-    rt_timer_start(valve_detect_once_timer);
+    rt_timer_stop(valve_detect_once_timer);
 
     return RT_EOK;
 }
@@ -158,7 +158,7 @@ uint8_t valve_check_detect_timeout_timer_callback(void *parameter)
     if(valve_left_low_check_start == 1 && valve_left_detect_low_success == 0)
     {
         valve_valid = 0;
-        valve_left_check_result = 1;
+        valve_left_warning_result = 1;
         valve_left_low_check_start = 0;
         warning_enable(ValveLeftFailEvent);
         rt_pin_write(MOTO_LEFT_CONTROL_PIN,PIN_HIGH);
@@ -182,7 +182,7 @@ uint8_t valve_check_left_final_timer_callback(void *parameter)
 {
     if(rt_pin_read(MOTO_LEFT_HALL_PIN) == 1)
     {
-        valve_left_check_result = 0;
+        valve_left_warning_result = 0;
         if(valve_right_warning_result == 0)
         {
             valve_valid = 1;
@@ -193,7 +193,7 @@ uint8_t valve_check_left_final_timer_callback(void *parameter)
     else
     {
         valve_valid = 0;
-        valve_left_check_result = 1;
+        valve_left_warning_result = 1;
         warning_enable(ValveLeftFailEvent);
         rt_kprintf("valve_left_check fail\r\n");
     }
@@ -204,7 +204,7 @@ uint8_t valve_check_right_final_timer_callback(void *parameter)
     if(rt_pin_read(MOTO_RIGHT_HALL_PIN) == 1)
     {
         valve_right_warning_result = 0;
-        if(valve_left_check_result == 0)
+        if(valve_left_warning_result == 0)
         {
             valve_valid = 1;
             valvefail_warning_disable();
@@ -228,11 +228,13 @@ void valve_check(void)
     valve_right_low_check_start = 0;
     valve_left_detect_low_success = 0;
     valve_right_detect_low_success = 0;
+
     rt_timer_stop(valve_check_detect_low_timer);
     rt_timer_stop(valve_check_detect_timeout_timer);
     rt_timer_stop(valve_check_left_final_timer);
     rt_timer_stop(valve_check_right_final_timer);
     rt_timer_stop(valve_detect_once_timer);
+
     if(rt_pin_read(MOTO_LEFT_HALL_PIN))
     {
         valve_left_low_check_start = 1;
